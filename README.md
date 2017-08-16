@@ -24,6 +24,11 @@ El objetivo es introducir como se usa las librerias para programacion funcional 
 
 -----------------------------------------------------
 
+### Setup
+1. 
+
+-----------------------------------------------------
+
 ### Librerias
 #### Normal
 
