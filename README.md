@@ -86,7 +86,39 @@ var COMPUTERS = [{
 -------------------------------------------------------
 
 ### 1. Currying
-Ej: Encontrar todas las marcas que tienen la letra 'E'.
+```javascript
+var add = function(x, y) {
+  return x + y;
+};
+
+add(1 + 2);
+//=> 3
+
+var addCurried = function(x) {
+  return function(y) {
+    return x + y;
+  };
+};
+
+var increment = addCurried(1);
+var addFive = addCurried(5);
+
+increment(3);
+//=> 4
+
+addFive(3);
+//=> 8
+
+addCurried(1)(2);
+//=> 3
+```
+Una funcion "curried" puede acceptar menos argumentos y devuelve una funcion. Uno puede escribir todas las funciones en forma curried pero va a tener caso como ``addCurried(1)(2)``. Entonces se usa ``curry`` para "currify" funciones.
+
+Ahora vamos a ver las distintas librerias y investigar las diferencias entre las librerias.
+
+--------------------------------------------------------
+
+Ej: Encontrar todas las marcas de laptops que tienen la letra 'E'.
 
 #### Normal
 ```javascript
