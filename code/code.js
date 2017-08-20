@@ -33,7 +33,7 @@ var COMPUTERS = [{
     model: 'Alienware',
     ram: 16, 
     dollar_value: 2000,
-    in_stock: true,
+    in_stock: false,
 }, {
     brand: 'MSI', 
     model: 'Dominator Pro',
@@ -45,7 +45,7 @@ var COMPUTERS = [{
     model: 'Gamer Nitro',
     ram: 16,
     dollar_value: 1500,
-    in_stock: true,
+    in_stock: false,
 }, {
     brand: 'Dell', 
     model: 'Latitude',
@@ -95,5 +95,36 @@ console.log(filterEsRamda(R.uniq(brands)));
 var filterEsFp = fp.filter(match(/e/i));
 var brands = fp.map(brandNameLowerCase, COMPUTERS);
 console.log(filterEsFp(fp.uniq(brands)));
+
+// Compose
+var toUpperCase = function(x) {
+  return x.toUpperCase();
+};
+var exclaim = function(x) {
+  return x + '!';
+};
+var shout = R.compose(exclaim, toUpperCase);
+console.log(shout("hello world"));
+
+var _average = function(xs) {
+  return R.reduce(R.add, 0, xs) / xs.length;
+};
+
+// Normal
+var averageDollarValue = function(computers) {
+  var dollar_values = R.map(function(c) {
+    return c.dollar_value;
+  }, computers);
+  return _average(dollar_values);
+};
+var computersOnStock = COMPUTERS.filter(function(x) { return x.in_stock == true; });
+console.log(averageDollarValue(computersOnStock));
+
+// ramda
+var isInStock = function(x) { return x.in_stock == true; };
+var averageDollarValueR = R.compose(_average, 
+                                    R.map(R.prop('dollar_value')), 
+                                    R.filter(isInStock));
+console.log(averageDollarValueR(COMPUTERS));
 
 
