@@ -28,6 +28,7 @@ Lodash y similares para soporte de paradigma funcional
 npm install ramda
 npm install lodash
 ```
+#### O, usar [Repl](https://repl.it/languages/javascript)
 
 -----------------------------------------------------
 
