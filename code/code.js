@@ -56,12 +56,15 @@ var COMPUTERS = [{
     
 // Normal
 var filterEs = function(xs) {
-    return xs.filter(function(x) { 
-      return x.match(/e/i);
-    });
+  return xs.filter(function(x) { 
+    return x.match(/e/i);
+  });
 };
 
 var brands = COMPUTERS.map(function(x) { return x.brand.toLowerCase(); });
+var aux = new Set(brands);
+brands = [];
+aux.forEach(function(x) {brands.push(x);});
 console.log(filterEs(brands));
 
 // Lodash
@@ -80,17 +83,17 @@ var brandNameLowerCase = function(x) {
 };
 var filterEsLodash = filter(match(/e/i));
 var brands = map(brandNameLowerCase, COMPUTERS);
-console.log(filterEsLodash(brands));
+console.log(filterEsLodash(_.uniq(brands)));
 
 // Ramda
 // match return a list or null in Ramda
 var filterEsRamda = R.filter(R.test(/e/i));
 var brands = R.map(brandNameLowerCase, COMPUTERS);
-console.log(filterEsRamda(brands));
+console.log(filterEsRamda(R.uniq(brands)));
 
 // lodash/fp
 var filterEsFp = fp.filter(match(/e/i));
 var brands = fp.map(brandNameLowerCase, COMPUTERS);
-console.log(filterEsFp(brands));
+console.log(filterEsFp(fp.uniq(brands)));
 
 
