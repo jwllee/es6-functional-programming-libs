@@ -149,8 +149,11 @@ let filterEs = function(xs) {
 };
 
 var brands = COMPUTERS.map((x) => x.brand.toLowerCase());
+var aux = new Set(brands);
+brands = [];
+aux.forEach(function(x) { brands.push(x);});
 console.log(filterEs(brands));
-//=> ['lenovo', 'apple', 'dell', 'acer', 'dell']
+//=> ['lenovo', 'apple', 'dell', 'acer']
 ```
 
 #### Lodash
