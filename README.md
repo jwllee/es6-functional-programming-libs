@@ -169,6 +169,7 @@ let brandNameLowerCase = (x) => x.brand.toLowerCase();
 let filterEsLodash = filter(match(/e/i));
 var brands = map(brandNameLowerCase, COMPUTERS);
 console.log(filterEsLodash(brands));
+//=> ['lenovo', 'apple', 'dell', 'acer']
 ```
 Una limitacion de Lodash es el orden de las funciones, siempre tienen que poner el dato antes de la funcion. Una manera para resolver esta limitacion es usar ``curry`` para reorganizar el orden.
 
@@ -179,6 +180,7 @@ const fp = require('lodash/fp');
 let filterEsFp = fp.filter(match(/e/i));
 var brands = fp.map(brandNameLowerCase, COMPUTERS);
 console.log(filterEsFp(fp.uniq(brands)));
+//=> ['lenovo', 'apple', 'dell', 'acer']
 ```
 La libreria Lodash/fp resuelve la limitacion de Lodash y ahora la reimplementacion accepta la funcion como el primer argumento. 
 
@@ -190,6 +192,7 @@ const R = require('ramda');
 let filterEsRamda = R.filter(R.test(/e/i));
 var brands = R.map(brandNameLowerCase, COMPUTERS);
 console.log(filterEsRamda(R.uniq(brands)));
+//=> ['lenovo', 'apple', 'dell', 'acer']
 ```
 La libreria Ramda tambien fue desarrollada por la limitacion de Lodash. Todas las funciones son "curried", i.e., pueden acceptar menos argumentos y devuelve una funcion. 
 
