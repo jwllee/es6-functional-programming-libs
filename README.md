@@ -81,6 +81,24 @@ const COMPUTERS = [{
     ram: 8, 
     dollar_value: 1000,
     in_stock: true,
+}, {
+       brand: 'Acer',
+       model: 'R7',
+       ram: 4,
+       dollar_value: 2000,
+       in_stock: true
+   }, {
+       brand: 'HP',
+       model: 'Pavillion',
+       ram: 16,
+       dollar_value: null,
+       in_stock: true
+   }, {
+       brand: 'HP',
+       model: 'Spectre',
+       ram: 8,
+       dollar_value: 1500,
+       in_stock: false
 }]
 ```
     
@@ -232,3 +250,121 @@ Entonces las funciones ``isInStock`` y ``averageDollarValueR`` pueden ser aplica
 
 -----------------------------------------------------------------------
 
+### 1. Monads
+
+Monads son un patron de diseño que describe procedimientos o calculos como una serie de pasos. Los monads envuelven datos dandoles algun comportamiento adicional.
+Presentaremos dos tipos de monads: Maybe monad, que se encarga de lidiar con los datos nulos o indefinidos, y Either monad, que facilita el manejo de errores.
+
+Lodash y ramda no implementan monads y por lo tanto si se quieren untilizar se debe ocupar una libreria externa como lodash-fantasy.js, monet.js, o
+la que ocuparemos en este caso ramda-fantasy.js.
+
+Ej: Imprimiendo informacion de items
+
+### Normal
+
+```javascript
+function display_item(item, currency) {
+    console.log(item.brand + " " + item.model);
+    if (item.dollar_value != null) {
+        console.log("Buy it for " + item.dollar_value);
+    } else {
+        console.log("Price: check directly in the store ");
+    }
+}
+
+display_item(COMPUTERS[9], 'clp');
+//=> HP Pavillion
+//=> Price: check directly in the store
+```
+
+### Ramda-fantasy maybe monad
+
+```javascript
+function ramda_display_item(item, currency) {
+    let value = M(item.dollar_value).getOrElse('check directly in the store');
+    console.log(item.brand + " " + item.model);
+    console.log("Price: " + value);
+}
+
+ramda_display_item(COMPUTERS[8], 'clp');
+
+//=> Acer R7
+//=> Price: 2000
+```
+
+Ej2: Comprando items sin errores
+
+### Normal
+
+```javascript
+const check_stock = function(item) {
+    if (item.in_stock === false) {
+        return new Error("item not in stock");
+    }
+    return true;
+};
+
+const apply_tax = function(tax, item) {
+    if (_.isNumber(item.dollar_value)) {
+        return item.dollar_value * (1 + tax);
+    }
+    return new Error("price is not numeric");
+};
+
+const is_error = (error) => { return error && error.name == 'Error' };
+
+const buy_item = function (item) {
+    let stock_check = check_stock(item);
+    let final_price = 0;
+
+    if (is_error(stock_check)) {
+        return console.log("Error " + stock_check.message);
+    }
+
+    final_price = apply_tax(0.19, item);
+    if (is_error(final_price)) {
+        return console.log("Error " + final_price.message);
+    }
+    return console.log("Congrats! the total was:  " + final_price);
+};
+
+buy_item(COMPUTERS[0]);
+//=> Congrats! the total was:  1190
+```
+
+### Ramda fantasy either monad
+
+```javascript
+const monad_check_stock = R.curry((item) => {
+    if (item.in_stock === false) {
+        return Either.Left(new Error("item not in stock"));
+    }
+    return Either.Right(item);
+});
+
+const monad_apply_tax = R.curry((tax, item) => {
+    if (_.isNumber(item.dollar_value)) {
+        return Either.Right(item.dollar_value * (1 + tax));
+    }
+    return Either.Left(new Error("price is not numeric"));
+});
+
+const monad_apply_iva_tax = monad_apply_tax(0.19);
+
+const log_error = function(error) {
+    return console.log("Error " + error.message);
+};
+
+const display_bought = function(price) {
+    return console.log("Congrats! the total was:  " + price);
+};
+
+const eitherLogOrShow = Either.either(log_error, display_bought);
+
+const monad_buy_item = function (item) {
+    eitherLogOrShow(Either.Right(item).chain(monad_check_stock).chain(monad_apply_iva_tax));
+};
+
+monad_buy_item(COMPUTERS[9]);
+//=> Error price is not numeric
+```
