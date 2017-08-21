@@ -14,6 +14,7 @@ Lodash y similares para soporte de paradigma funcional
 -----------------------------------------------------
 
 ### Recursos
+- [FP in JavaScript](https://medium.freecodecamp.org/functional-programming-in-js-with-practical-examples-part-1-87c2b0dbc276)
 - (Youtube) [Porque importa el orden de los parametros de funciones](https://www.youtube.com/watch?v=m3svKOdZijA)
 - Ramda docs](http://ramdajs.com/)
 - [Lodash docs](https://lodash.com/)
