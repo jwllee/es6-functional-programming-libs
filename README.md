@@ -173,9 +173,9 @@ let filter = curry((f, x) => _.filter(x, f));
 let match = curry((what, x) => x.match(what));
 
 let brandNameLowerCase = function(x) { return x.brand.toLowerCase(); };
-let brandNameLowerCase = map(brandNameLowerCase);
+let brandNameLowerCaseList = map(brandNameLowerCase);
 let filterEsLodash = filter(match(/e/i));
-var brands = brandNameLowerCase(COMPUTERS);
+var brands = brandNameLowerCaseList(COMPUTERS);
 console.log(filterEsLodash(brands));
 //=> ['lenovo', 'apple', 'dell', 'acer']
 ```
@@ -186,9 +186,9 @@ Una limitacion de Lodash es el orden de las funciones, siempre tienen que poner 
 const fp = require('lodash/fp');
 
 let brandNameLowerCase = function(x) { return x.brand.toLowerCase(); };
-let brandNameLowerCase = fp.map(brandNameLowerCase);
+let brandNameLowerCaseList = fp.map(brandNameLowerCase);
 let filterEsFp = fp.filter(match(/e/i));
-var brands = brandNameLowerCase(COMPUTERS);
+var brands = brandNameLowerCaseList(COMPUTERS);
 console.log(filterEsFp(fp.uniq(brands)));
 //=> ['lenovo', 'apple', 'dell', 'acer']
 ```
@@ -200,9 +200,9 @@ const R = require('ramda');
 
 // match return a list or null in Ramda
 let brandNameLowerCase = function(x) { return x.brand.toLowerCase(); };
-let brandNameLowerCase = R.map(brandNameLowerCase);
+let brandNameLowerCaseList = R.map(brandNameLowerCase);
 let filterEsRamda = R.filter(R.test(/e/i));
-var brands = brandNameLowerCase(COMPUTERS);
+var brands = brandNameLowerCaseList(COMPUTERS);
 console.log(filterEsRamda(R.uniq(brands)));
 //=> ['lenovo', 'apple', 'dell', 'acer']
 ```
