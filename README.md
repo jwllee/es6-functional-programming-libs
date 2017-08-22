@@ -148,10 +148,17 @@ let filterEs = function(xs) {
   });
 };
 
-var brands = COMPUTERS.map((x) => x.brand.toLowerCase());
+var brands = [];
+// Get the brands in lower case
+for (let i = 0; i < COMPUTERS.length; i++) {
+  brands.push(COMPUTERS[i].brand.toLowerCase());
+};
+// Use set to get unique brand values
 var aux = new Set(brands);
 brands = [];
-aux.forEach(function(x) { brands.push(x);});
+for (let brand of aux) {
+  brands.push(x);
+};
 console.log(filterEs(brands));
 //=> ['lenovo', 'apple', 'dell', 'acer']
 ```
@@ -165,9 +172,10 @@ let map = curry((f, xs) => _.map(xs, f));
 let filter = curry((f, x) => _.filter(x, f));
 let match = curry((what, x) => x.match(what));
 
-let brandNameLowerCase = (x) => x.brand.toLowerCase();
+let brandNameLowerCase = function(x) { return x.brand.toLowerCase(); };
+let brandNameLowerCase = map(brandNameLowerCase);
 let filterEsLodash = filter(match(/e/i));
-var brands = map(brandNameLowerCase, COMPUTERS);
+var brands = brandNameLowerCase(COMPUTERS);
 console.log(filterEsLodash(brands));
 //=> ['lenovo', 'apple', 'dell', 'acer']
 ```
@@ -177,8 +185,10 @@ Una limitacion de Lodash es el orden de las funciones, siempre tienen que poner 
 ```javascript
 const fp = require('lodash/fp');
 
+let brandNameLowerCase = function(x) { return x.brand.toLowerCase(); };
+let brandNameLowerCase = fp.map(brandNameLowerCase);
 let filterEsFp = fp.filter(match(/e/i));
-var brands = fp.map(brandNameLowerCase, COMPUTERS);
+var brands = brandNameLowerCase(COMPUTERS);
 console.log(filterEsFp(fp.uniq(brands)));
 //=> ['lenovo', 'apple', 'dell', 'acer']
 ```
@@ -189,8 +199,10 @@ La libreria Lodash/fp resuelve la limitacion de Lodash y ahora la reimplementaci
 const R = require('ramda');
 
 // match return a list or null in Ramda
+let brandNameLowerCase = function(x) { return x.brand.toLowerCase(); };
+let brandNameLowerCase = R.map(brandNameLowerCase);
 let filterEsRamda = R.filter(R.test(/e/i));
-var brands = R.map(brandNameLowerCase, COMPUTERS);
+var brands = brandNameLowerCase(COMPUTERS);
 console.log(filterEsRamda(R.uniq(brands)));
 //=> ['lenovo', 'apple', 'dell', 'acer']
 ```
@@ -218,6 +230,7 @@ let exclaim = function(x) {
   return x + '!';
 };
 let shout = R.compose(exclaim, toUpperCase);
+console.log(shout('hello world'));
 //=> "HELLO WORLD!"
 ```
 
