@@ -61,10 +61,15 @@ var filterEs = function(xs) {
   });
 };
 
-var brands = COMPUTERS.map(function(x) { return x.brand.toLowerCase(); });
+var brands = [];
+for (let i = 0; i < COMPUTERS.length; i++) {
+  brands.push(COMPUTERS[i].brand.toLowerCase());
+};
 var aux = new Set(brands);
 brands = [];
-aux.forEach(function(x) {brands.push(x);});
+for (let brand of aux) {
+  brands.push(brand);
+};
 console.log(filterEs(brands));
 
 // Lodash
@@ -82,18 +87,21 @@ var brandNameLowerCase = function(x) {
   return x.brand.toLowerCase();
 };
 var filterEsLodash = filter(match(/e/i));
-var brands = map(brandNameLowerCase, COMPUTERS);
+var brandNameLowerCaseLodash = map(brandNameLowerCase);
+var brands = brandNameLowerCaseLodash(COMPUTERS);
 console.log(filterEsLodash(_.uniq(brands)));
 
 // Ramda
 // match return a list or null in Ramda
 var filterEsRamda = R.filter(R.test(/e/i));
-var brands = R.map(brandNameLowerCase, COMPUTERS);
+var brandNameLowerCaseRamda = R.map(brandNameLowerCase);
+var brands = brandNameLowerCaseRamda(COMPUTERS);
 console.log(filterEsRamda(R.uniq(brands)));
 
 // lodash/fp
 var filterEsFp = fp.filter(match(/e/i));
-var brands = fp.map(brandNameLowerCase, COMPUTERS);
+var brandNameLowerCaseFp = fp.map(brandNameLowerCase);
+var brands = brandNameLowerCaseFp(COMPUTERS);
 console.log(filterEsFp(fp.uniq(brands)));
 
 
