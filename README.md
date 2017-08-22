@@ -250,17 +250,20 @@ Entonces las funciones ``isInStock`` y ``averageDollarValueR`` pueden ser aplica
 
 -----------------------------------------------------------------------
 
-### 1. Monads
+### 3. Monads
 
+Existen importantes tecnicas de programación funcional que ni Lodash, Ramda y Lodash/fp implementan, entre los que se encuentran
+functors y monads.
 Monads son un patron de diseño que describe procedimientos o calculos como una serie de pasos. Los monads envuelven datos dandoles algun comportamiento adicional.
-Presentaremos dos tipos de monads: Maybe monad, que se encarga de lidiar con los datos nulos o indefinidos, y Either monad, que facilita el manejo de errores.
+1. Maybe monad: que permite un seguro manejo de datos nulos o indefinidos.
+2. Either monad: que facilita el manejo de errores.
 
 Lodash y ramda no implementan monads y por lo tanto si se quieren untilizar se debe ocupar una libreria externa como lodash-fantasy.js, monet.js, o
 la que ocuparemos en este caso ramda-fantasy.js.
 
 Ej: Imprimiendo informacion de items
 
-### Normal
+#### Normal
 
 ```javascript
 function display_item(item, currency) {
@@ -277,11 +280,11 @@ display_item(COMPUTERS[9], 'clp');
 //=> Price: check directly in the store
 ```
 
-### Ramda-fantasy maybe monad
+#### Ramda-fantasy maybe monad
 
 ```javascript
 function ramda_display_item(item, currency) {
-    let value = M(item.dollar_value).getOrElse('check directly in the store');
+    let value = Maybe(item.dollar_value).getOrElse('check directly in the store');
     console.log(item.brand + " " + item.model);
     console.log("Price: " + value);
 }
@@ -294,9 +297,11 @@ ramda_display_item(COMPUTERS[8], 'clp');
 
 Ej2: Comprando items sin errores
 
-### Normal
+#### Normal
 
 ```javascript
+const is_error = (error) => { return error && error.name == 'Error' };
+
 const check_stock = function(item) {
     if (item.in_stock === false) {
         return new Error("item not in stock");
@@ -311,17 +316,13 @@ const apply_tax = function(tax, item) {
     return new Error("price is not numeric");
 };
 
-const is_error = (error) => { return error && error.name == 'Error' };
-
 const buy_item = function (item) {
     let stock_check = check_stock(item);
-    let final_price = 0;
-
     if (is_error(stock_check)) {
         return console.log("Error " + stock_check.message);
     }
 
-    final_price = apply_tax(0.19, item);
+    let final_price = apply_tax(0.19, item);
     if (is_error(final_price)) {
         return console.log("Error " + final_price.message);
     }
@@ -332,7 +333,7 @@ buy_item(COMPUTERS[0]);
 //=> Congrats! the total was:  1190
 ```
 
-### Ramda fantasy either monad
+#### Ramda fantasy either monad
 
 ```javascript
 const monad_check_stock = R.curry((item) => {
@@ -367,4 +368,76 @@ const monad_buy_item = function (item) {
 
 monad_buy_item(COMPUTERS[9]);
 //=> Error price is not numeric
+```
+
+Por otro lado, tambien se pueden implementar mediante una clase que defina los metodos map, isNothing, entre otros.
+Como se muestra a continuación:
+
+```javascript
+
+class Maybe {
+
+    constructor(val) {
+        this.__value = val;
+    }
+
+    is_nothing() {
+        return (this.__value === null || this.__value === undefined);
+    }
+
+
+    map(func) {
+        if (this.is_nothing()) {
+            return Maybe.of(null);
+        }
+        return Maybe.of(func(this.__value));
+    }
+
+    join() {
+        return this.__value;
+    }
+
+    chain(func) {
+        return this.map(func).join();
+    }
+
+    or_else(def) {
+        if (this.is_nothing()) {
+            return Maybe.of(def);
+        }
+        return this;
+    }
+
+    static of(val) {
+        return new Maybe(val);
+    }
+}
+
+```
+
+A continuación un ejemplo en el que se ocupan este clase Maybe, junto con: curry, compose y pointfree:
+
+```javascript
+let safeHead = function(xs) {
+    return Maybe.of(xs[0]);
+};
+
+let streetName = R.compose(R.map(R.prop('street')), safeHead, R.prop('addresses'));
+
+let street1 = streetName({
+    addresses: [],
+});
+console.log(street1);
+//=> Maybe(null)
+
+
+let street2 = streetName({
+    addresses: [{
+        street: 'Fitz Roy',
+        number: 1460,
+    }],
+});
+
+console.log(street2);
+//=> Maybe("Fitz Roy")
 ```

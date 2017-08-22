@@ -1,6 +1,7 @@
 _ = require("lodash");
 R = require("ramda");
-M = require("ramda-fantasy").Maybe;
+Monet = require("monet");
+Maybe = require("ramda-fantasy").Maybe;
 Either = require("ramda-fantasy").Either;
 
 // Data
@@ -90,16 +91,28 @@ display_item(COMPUTERS[9], 'clp');
 // Ramda fantasy maybe monads
 
 function ramda_display_item(item, currency) {
-    let value = M(item.dollar_value).getOrElse('check directly in the store');
+    let value = Maybe(item.dollar_value).getOrElse('check directly in the store');
     console.log(item.brand + " " + item.model);
     console.log("Price: " + value);
 }
 
 ramda_display_item(COMPUTERS[8], 'clp');
 
+// monet maybe monads
+
+function monet_display_item(item, currency) {
+    let value = Monet.Maybe.fromNull(item.dollar_value).orSome('check directly in the store');
+    console.log(item.brand + " " + item.model);
+    console.log("Price: " + value);
+}
+
+monet_display_item(COMPUTERS[8], 'clp');
+
 // ************* buying an item without errors *******************************
 
 // Normal
+
+const is_error = (error) => { return error && error.name == 'Error' };
 
 const check_stock = function(item) {
     if (item.in_stock === false) {
@@ -115,17 +128,13 @@ const apply_tax = function(tax, item) {
     return new Error("price is not numeric");
 };
 
-const is_error = (error) => { return error && error.name == 'Error' };
-
 const buy_item = function (item) {
     let stock_check = check_stock(item);
-    let final_price = 0;
-
     if (is_error(stock_check)) {
         return console.log("Error " + stock_check.message);
     }
 
-    final_price = apply_tax(0.19, item);
+    let final_price = apply_tax(0.19, item);
     if (is_error(final_price)) {
         return console.log("Error " + final_price.message);
     }
@@ -167,3 +176,4 @@ const monad_buy_item = function (item) {
 };
 
 monad_buy_item(COMPUTERS[9]);
+
