@@ -166,7 +166,6 @@ console.log(filterEs(brands));
 #### Lodash
 ```javascript
 const _ = require('lodash');
-
 // Need to reimplement functions because of the order of the parameters
 let map = curry((f, xs) => _.map(xs, f));
 let filter = curry((f, x) => _.filter(x, f));
@@ -184,7 +183,6 @@ Una limitacion de Lodash es el orden de las funciones, siempre tienen que poner 
 #### Lodash/fp
 ```javascript
 const fp = require('lodash/fp');
-
 let brandNameLowerCase = function(x) { return x.brand.toLowerCase(); };
 let brandNameLowerCaseList = fp.map(brandNameLowerCase);
 let filterEsFp = fp.filter(match(/e/i));
@@ -197,10 +195,9 @@ La libreria Lodash/fp resuelve la limitacion de Lodash y ahora la reimplementaci
 #### Ramda
 ```javascript
 const R = require('ramda');
-
-// match return a list or null in Ramda
 let brandNameLowerCase = function(x) { return x.brand.toLowerCase(); };
 let brandNameLowerCaseList = R.map(brandNameLowerCase);
+// match return a list or null in Ramda
 let filterEsRamda = R.filter(R.test(/e/i));
 var brands = brandNameLowerCaseList(COMPUTERS);
 console.log(filterEsRamda(R.uniq(brands)));
