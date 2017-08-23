@@ -267,10 +267,30 @@ Entonces las funciones ``isInStock`` y ``averageDollarValueR`` pueden ser aplica
 
 -----------------------------------------------------------------------
 
-### 3. Monads
+### 3. Functors y Monads
 
 Existen importantes tecnicas de programación funcional que ni Lodash, Ramda y Lodash/fp implementan, entre los que se encuentran
 functors y monads.
+
+Functor es simplemente una estructura que contiene un valor, y define el metodo map. por ejemplo:
+
+```javascript
+class Functor {
+
+    constructor(val) {
+        this.__value = val;
+    }
+
+    map(func) {
+        return Functor.of(func(this.__value));
+    }
+
+    static of(val) {
+        return new Functor(val);
+    }
+}
+```
+
 Monads son un patron de diseño que describe procedimientos o calculos como una serie de pasos. Los monads envuelven datos dandoles algun comportamiento adicional.
 1. Maybe monad: que permite un seguro manejo de datos nulos o indefinidos.
 2. Either monad: que facilita el manejo de errores.
@@ -280,36 +300,46 @@ la que ocuparemos en este caso ramda-fantasy.js.
 
 Ej: Imprimiendo informacion de items
 
+En este ejemplo Maybe Monad permite despreocuparse de forma segura de los posibles valores null o undefined
+que pueden aparecer. Esto lo hace mediante la clase Maybe que envuelve un valor. Para llamar una función sobre
+este valor se realiza mediante el metodo map, pero cuando el valor dentro de maybe es nulo, la instancia no 
+ejecuta la función sobre el valor sino que devuelve otra instancia de Maybe con valor null.
+
 #### Normal
 
 ```javascript
-function display_item(item, currency) {
+const apply_eeuu_tax = R.multiply(1.11);
+
+function display_item(item) {
     console.log(item.brand + " " + item.model);
     if (item.dollar_value != null) {
-        console.log("Buy it for " + item.dollar_value);
-    } else {
-        console.log("Price: check directly in the store ");
+        return console.log("Buy it for " + apply_tax(item.dollar_value));
     }
+    return console.log("Price: check directly in the store ");
 }
 
-display_item(COMPUTERS[9], 'clp');
-//=> HP Pavillion
-//=> Price: check directly in the store
+display_item(COMPUTERS[9]);
+// => HP Pavillion
+// => Price: check directly in the store
 ```
 
 #### Ramda-fantasy maybe monad
 
 ```javascript
-function ramda_display_item(item, currency) {
-    let value = Maybe(item.dollar_value).getOrElse('check directly in the store');
+function ramda_display_item(item) {
+    let value = Maybe(item.dollar_value).map(apply_eeuu_tax).getOrElse('check directly in the store');
     console.log(item.brand + " " + item.model);
     console.log("Price: " + value);
 }
 
-ramda_display_item(COMPUTERS[8], 'clp');
+ramda_display_item(COMPUTERS[8]);
+// => Acer R7
+// => Price: 2000
 
-//=> Acer R7
-//=> Price: 2000
+
+ramda_display_item(COMPUTERS[9]);
+// => HP Pavillion
+// => Price: check directly in the store
 ```
 
 Ej2: Comprando items sin errores
@@ -343,11 +373,14 @@ const buy_item = function (item) {
     if (is_error(final_price)) {
         return console.log("Error " + final_price.message);
     }
-    return console.log("Congrats! the total was:  " + final_price);
+    return console.log("You've completed the buy, price was:  " + final_price);
 };
 
-buy_item(COMPUTERS[0]);
-//=> Congrats! the total was:  1190
+buy_item(COMPUTERS[9]);
+// => Error price is not numeric
+
+buy_item(COMPUTERS[8]);
+// => You've completed the buy, price was:  2380
 ```
 
 #### Ramda fantasy either monad
@@ -374,7 +407,7 @@ const log_error = function(error) {
 };
 
 const display_bought = function(price) {
-    return console.log("Congrats! the total was:  " + price);
+    return console.log("You've completed the buy, price was:  " + price);
 };
 
 const eitherLogOrShow = Either.either(log_error, display_bought);
@@ -384,8 +417,15 @@ const monad_buy_item = function (item) {
 };
 
 monad_buy_item(COMPUTERS[9]);
-//=> Error price is not numeric
+// => Error price is not numeric
+
+monad_buy_item(COMPUTERS[8]);
+// => You've completed the buy, price was:  2380
 ```
+
+Either monad permite una forma segura de manejo de errores, en la cual se definen dos clases, Right para
+los valores, y Left para los errores. Cuando se llama una función desde Left, esta no la utiliza sino que
+devuelve la misma instancia de left.
 
 Por otro lado, tambien se pueden implementar mediante una clase que defina los metodos map, isNothing, entre otros.
 Como se muestra a continuación:
@@ -432,7 +472,7 @@ class Maybe {
 
 ```
 
-A continuación un ejemplo en el que se ocupan este clase Maybe, junto con: curry, compose y pointfree:
+A continuación un ejemplo en el que se ocupan esta clase Maybe, junto con: curry, compose y pointfree:
 
 ```javascript
 let safeHead = function(xs) {
