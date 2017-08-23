@@ -77,36 +77,46 @@ var COMPUTERS = [{
 
 // Normal
 
-function display_item(item, currency) {
+const apply_eeuu_tax = R.multiply(1.11);
+
+function display_item(item) {
     console.log(item.brand + " " + item.model);
     if (item.dollar_value != null) {
-        console.log("Buy it for " + item.dollar_value);
-    } else {
-        console.log("Price: check directly in the store ");
+        return console.log("Buy it for " + apply_tax(item.dollar_value));
     }
+    return console.log("Price: check directly in the store ");
 }
 
-display_item(COMPUTERS[9], 'clp');
+display_item(COMPUTERS[9]);
+// => HP Pavillion
+// => Price: check directly in the store
 
 // Ramda fantasy maybe monads
 
-function ramda_display_item(item, currency) {
-    let value = Maybe(item.dollar_value).getOrElse('check directly in the store');
+function ramda_display_item(item) {
+    let value = Maybe(item.dollar_value).map(apply_eeuu_tax).getOrElse('check directly in the store');
     console.log(item.brand + " " + item.model);
     console.log("Price: " + value);
 }
 
-ramda_display_item(COMPUTERS[8], 'clp');
+ramda_display_item(COMPUTERS[8]);
+// => Acer R7
+// => Price: 2000
+
+
+ramda_display_item(COMPUTERS[9]);
+// => HP Pavillion
+// => Price: check directly in the store
 
 // monet maybe monads
 
-function monet_display_item(item, currency) {
+function monet_display_item(item) {
     let value = Monet.Maybe.fromNull(item.dollar_value).orSome('check directly in the store');
     console.log(item.brand + " " + item.model);
     console.log("Price: " + value);
 }
 
-monet_display_item(COMPUTERS[8], 'clp');
+monet_display_item(COMPUTERS[8]);
 
 // ************* buying an item without errors *******************************
 
@@ -138,10 +148,14 @@ const buy_item = function (item) {
     if (is_error(final_price)) {
         return console.log("Error " + final_price.message);
     }
-    return console.log("Congrats! the total was:  " + final_price);
+    return console.log("You've completed the buy, price was:  " + final_price);
 };
 
-buy_item(COMPUTERS[0]);
+buy_item(COMPUTERS[9]);
+// => Error price is not numeric
+
+buy_item(COMPUTERS[8]);
+// => You've completed the buy, price was:  2380
 
 // Ramda fantasy either monads
 
@@ -166,7 +180,7 @@ const log_error = function(error) {
 };
 
 const display_bought = function(price) {
-    return console.log("Congrats! the total was:  " + price);
+    return console.log("You've completed the buy, price was:  " + price);
 };
 
 const eitherLogOrShow = Either.either(log_error, display_bought);
@@ -176,4 +190,9 @@ const monad_buy_item = function (item) {
 };
 
 monad_buy_item(COMPUTERS[9]);
+// => Error price is not numeric
+
+monad_buy_item(COMPUTERS[8]);
+// => You've completed the buy, price was:  2380
+
 

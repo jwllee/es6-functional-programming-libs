@@ -52,7 +52,7 @@ var COMPUTERS = [{
     ram: 8, 
     dollar_value: 1000,
     in_stock: true,
-}]
+}];
     
 // Normal
 var filterEs = function(xs) {
@@ -77,15 +77,19 @@ console.log(filterEs(brands));
 var map = curry(function(f, xs) {
   return _.map(xs, f);
 });
+
 var filter = curry(function(f, x) {
   return _.filter(x, f);
 });
+
 var match = curry(function(what, x) {
   return x.match(what);
 });
+
 var brandNameLowerCase = function(x) {
   return x.brand.toLowerCase();
 };
+
 var filterEsLodash = filter(match(/e/i));
 var brandNameLowerCaseLodash = map(brandNameLowerCase);
 var brands = brandNameLowerCaseLodash(COMPUTERS);
